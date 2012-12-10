@@ -3,7 +3,12 @@ package ru.madzi.o2;
 import java.io.IOException;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.text.MultiViewEditorElement;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.MIMEResolver;
+import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
@@ -11,6 +16,70 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+@Messages({
+    "LBL_O2_LOADER=Files of O2"
+})
+@MIMEResolver.ExtensionRegistration(
+    displayName = "#LBL_O2_LOADER",
+mimeType = "text/x-oberon-2",
+extension = {"o2", "O2"})
+@DataObject.Registration(
+    mimeType = "text/x-oberon-2",
+iconBase = "ru/madzi/o2/oberon-2-icon.png",
+displayName = "#LBL_O2_LOADER",
+position = 300)
+@ActionReferences({
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.OpenAction"),
+    position = 100,
+    separatorAfter = 200),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "Edit", id = "org.openide.actions.CutAction"),
+    position = 300),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "Edit", id = "org.openide.actions.CopyAction"),
+    position = 400,
+    separatorAfter = 500),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "Edit", id = "org.openide.actions.DeleteAction"),
+    position = 600),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.RenameAction"),
+    position = 700,
+    separatorAfter = 800),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.SaveAsTemplateAction"),
+    position = 900,
+    separatorAfter = 1000),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.FileSystemAction"),
+    position = 1100,
+    separatorAfter = 1200),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.ToolsAction"),
+    position = 1300),
+    @ActionReference(
+        path = "Loaders/text/x-oberon-2/Actions",
+    id =
+    @ActionID(category = "System", id = "org.openide.actions.PropertiesAction"),
+    position = 1400)
+})
 public class O2DataObject extends MultiDataObject {
 
     public O2DataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
@@ -23,8 +92,9 @@ public class O2DataObject extends MultiDataObject {
         return 1;
     }
 
-    @MultiViewElement.Registration(displayName = "#LBL_O2_EDITOR",
-    iconBase = "ru/madzi/o2/oberon2-icon.png",
+    @MultiViewElement.Registration(
+        displayName = "#LBL_O2_EDITOR",
+    iconBase = "ru/madzi/o2/oberon-2-icon.png",
     mimeType = "text/x-oberon-2",
     persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED,
     preferredID = "O2",
