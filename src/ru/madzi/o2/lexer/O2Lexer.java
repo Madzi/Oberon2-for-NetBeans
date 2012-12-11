@@ -55,6 +55,7 @@ class O2Lexer implements Lexer<O2TokenId> {
         } else if (Character.isWhitespace(ch)) {
             return O2Token.WHITESPACE;
         } else if (Character.isDigit(ch)) {
+            undoChar();
             return number();
         } else if (Character.isJavaIdentifierStart(ch)) {
             undoChar();
@@ -162,6 +163,16 @@ class O2Lexer implements Lexer<O2TokenId> {
     }
 
     private O2Token number() {
+        char ch = getChar();
+        while (ch != EOF && isNumberChar(ch)) {
+            if (ch == 'H') {
+                return O2Token.NUMBER;
+            } else if (ch == 'X') {
+                return O2Token.NUMBER;
+            }
+            ch = getChar();
+        }
+        undoChar();
         return O2Token.NUMBER;
     }
 
@@ -224,6 +235,31 @@ class O2Lexer implements Lexer<O2TokenId> {
             return O2Token.ERROR;
         }
         return O2Token.COMMENT;
+    }
+
+    private static boolean isNumberChar(char ch) {
+        switch (ch) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'H':
+            case 'X':
+                return true;
+        }
+        return false;
     }
 
     private enum CommentState {
