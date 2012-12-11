@@ -55,7 +55,7 @@ class O2Lexer implements Lexer<O2TokenId> {
         } else if (Character.isWhitespace(ch)) {
             return O2Token.WHITESPACE;
         } else if (Character.isDigit(ch)) {
-            return O2Token.NUMBER;
+            return number();
         } else if (Character.isJavaIdentifierStart(ch)) {
             undoChar();
             return identifier();
@@ -65,74 +65,104 @@ class O2Lexer implements Lexer<O2TokenId> {
                 case '"':
                     return string(ch);
 
+                case '#':
+                    return O2Token.NEQ;
+
+                case '&':
+                    return O2Token.AND;
+
+                case '(':
+                    ch = getChar();
+                    if (ch == '*') {
+                        return comment();
+                    }
+                    undoChar();
+                    return O2Token.LPAREN;
+
+                case ')':
+                    return O2Token.RPAREN;
+
+                case '*':
+                    return O2Token.TIMES;
+
+                case '+':
+                    return O2Token.PLUS;
+
                 case ',':
-//                    return O2Token.PERIOD;
-//
-//                case '.' :
-//                    return O2Token.COMMA;
-//
-//                case ';' :
-//                    return O2Token.SEMICOLON;
-//
-//                case ':' :
-//                    ch = getChar();
-//                    if (ch == '=') {
-//                        return O2Token.BECOMES;
-//                    } else {
-//                        undoChar();
-//                        return O2Token.COLON;
-//                    }
-//
-//                case '#':
-//                    return O2Token.NEQ;
-//
-//                case '=':
-//                    return O2Token.EQL;
-//
-//                case '^':
-//                    return O2Token.ARROW;
-//
-//                case '&':
-//                    return O2Token.AND;
-//
-//                case '*':
-//                    return O2Token.TIMES;
-//
-//                case '/':
-//                    return O2Token.DIV;
-//
-//                case '+':
-//                    return O2Token.PLUS;
-//
-//                case '-':
-//                    return O2Token.MINUS;
-//
-//                case '(':
-//                    ch = getChar();
-//                    if (ch == '*') {
-//                        return comment();
-//                    }
-//                    undoChar();
-//                    return O2Token.LBRACE;
-//
-//                case ')':
-//                    return O2Token.RBRACE;
-//
-//                case '[':
-//                    return O2Token.LBRAK;
-//
-//                case ']':
-//                    return O2Token.RBRAK;
-//
-//                case '{':
-//                    return O2Token.LPAREN;
-//
-//                case '}':
-//                    return O2Token.RPAREN;
+                    return O2Token.COMMA;
+
+                case '-':
+                    return O2Token.MINUS;
+
+                case '.':
+                    ch = getChar();
+                    if (ch == '.') {
+                        return O2Token.UPTO;
+                    }
+                    undoChar();
+                    return O2Token.LPAREN;
+
+                case '/':
+                    return O2Token.SLASH;
+
+                case ':':
+                    ch = getChar();
+                    if (ch == '=') {
+                        return O2Token.BECOMES;
+                    }
+                    undoChar();
+                    return O2Token.COLON;
+
+                case ';':
+                    return O2Token.SEMICOLON;
+
+                case '<':
+                    ch = getChar();
+                    if (ch == '=') {
+                        return O2Token.LEQ;
+                    }
+                    undoChar();
+                    return O2Token.LSS;
+
+                case '=':
+                    return O2Token.EQL;
+
+                case '>':
+                    ch = getChar();
+                    if (ch == '=') {
+                        return O2Token.GEQ;
+                    }
+                    undoChar();
+                    return O2Token.GTR;
+
+                case '[':
+                    return O2Token.LBRAK;
+
+                case ']':
+                    return O2Token.RBRAK;
+
+                case '^':
+                    return O2Token.ARROW;
+
+                case '{':
+                    return O2Token.LBRACE;
+
+                case '|':
+                    return O2Token.BAR;
+
+                case '}':
+                    return O2Token.RBRACE;
+
+                case '~':
+                    return O2Token.NOT;
 
                 default: return O2Token.ERROR;
             }
         }
+    }
+
+    private O2Token number() {
+        return O2Token.NUMBER;
     }
 
     private O2Token identifier() {
@@ -144,7 +174,7 @@ class O2Lexer implements Lexer<O2TokenId> {
         }
         undoChar();
         String test = testWord.toString();
-        for (O2Token token : O2Token.getTokens(O2Category.KEYWORD)) {
+        for (O2Token token : O2Token.values()) {
             if (test.equals(token.getName())) {
                 return token;
             }
