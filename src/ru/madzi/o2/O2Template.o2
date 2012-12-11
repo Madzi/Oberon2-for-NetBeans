@@ -1,3 +1,13 @@
-MODULE ident;
+MODULE Ident;
 
-END ident.
+IMPORT
+    someMod;
+
+TYPE
+    TestType = ARRAY OF CHAR;
+
+PROCEDURE Test*();
+BEGIN
+END Test;
+
+END Ident;
