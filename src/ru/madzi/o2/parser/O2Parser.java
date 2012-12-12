@@ -6,7 +6,11 @@ import org.netbeans.modules.parsing.api.Task;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.Parser;
 import org.netbeans.modules.parsing.spi.SourceModificationEvent;
+import org.netbeans.spi.lexer.LexerRestartInfo;
+import ru.madzi.o2.lexer.O2Lexer;
 import ru.madzi.o2.ast.ASTNode;
+import ru.madzi.o2.lexer.O2LanguageHierarchy;
+import ru.madzi.o2.lexer.O2TokenId;
 
 /**
  * @author Dmitry Eliseev

@@ -37,7 +37,7 @@ public class O2LanguageHierarchy extends LanguageHierarchy<O2TokenId> {
 
     @Override
     protected Lexer<O2TokenId> createLexer(LexerRestartInfo<O2TokenId> info) {
-        return new O2Lexer(info);
+        return new O2WarpLexer(info);
     }
 
     @Override

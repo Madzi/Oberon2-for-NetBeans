@@ -1,18 +1,11 @@
 package ru.madzi.o2.lexer;
 
-import org.netbeans.api.lexer.Token;
-import org.netbeans.spi.lexer.Lexer;
-import org.netbeans.spi.lexer.LexerInput;
-import org.netbeans.spi.lexer.LexerRestartInfo;
-
 /**
  * @author deliseev
  */
-class O2Lexer implements Lexer<O2TokenId> {
+public class O2Lexer {
 
-    public static final char EOF = (char) -1;
-
-    private LexerRestartInfo<O2TokenId> info;
+    private O2CharStream stream;
 
     private long intVal;
 
@@ -20,41 +13,21 @@ class O2Lexer implements Lexer<O2TokenId> {
 
     private String strVal;
 
-    public O2Lexer(LexerRestartInfo<O2TokenId> info) {
-        this.info = info;
-    }
-
-    @Override
-    public Token<O2TokenId> nextToken() {
-        O2Token token = getToken();
-        if (token != O2Token.EOF) {
-            O2TokenId tokenId = O2LanguageHierarchy.getToken(token.getId());
-            return info.tokenFactory().createToken(tokenId);
-        }
-        return null;
-    }
-
-    @Override
-    public Object state() {
-        return null;
-    }
-
-    @Override
-    public void release() {
+    public O2Lexer(O2CharStream stream) {
+        this.stream = stream;
     }
 
     private char getChar() {
-        int sym = info.input().read();
-        return sym == LexerInput.EOF ? EOF : (char) sym;
+        return stream.read();
     }
 
     private void undoChar() {
-        info.input().backup(1);
+        stream.undoChar(1);
     }
 
-    private O2Token getToken() {
+    public O2Token getToken() {
         char ch = getChar();
-        if (ch == EOF) {
+        if (ch == stream.EOF) {
             return O2Token.EOF;
         } else if (Character.isWhitespace(ch)) {
             return O2Token.WHITESPACE;
@@ -181,13 +154,6 @@ class O2Lexer implements Lexer<O2TokenId> {
         return x;
     }
 
-    /**
-     * Convert char into number.
-     * 
-     * @param ch the char
-     * @param hex flag, if <b>true</b>that used hex digits
-     * @return the number
-     */
     private int ord(char ch, boolean hex) {
         switch (ch) {
             case '0':
@@ -249,10 +215,10 @@ class O2Lexer implements Lexer<O2TokenId> {
     private O2Token number() {
         boolean wasdot = false;
         boolean real = false;
-        char prev = EOF;
+        char prev = stream.EOF;
         char ch = getChar();
         StringBuilder sb = new StringBuilder();
-        while (ch != EOF && isNumberChar(ch)) {
+        while (ch != stream.EOF && isNumberChar(ch)) {
             if (ch == 'H') {
                 intVal = parseInt(sb.toString(), ch);
                 return real ? O2Token.ERROR : O2Token.NUMBER;
@@ -271,12 +237,12 @@ class O2Lexer implements Lexer<O2TokenId> {
                     wasdot = true;
                 }
             } else if (ch == '-') {
-                if (prev != EOF && prev != 'E') {
+                if (prev != stream.EOF && prev != 'E') {
                     undoChar();
                     return O2Token.NUMBER;
                 }
             } else if (ch == '+') {
-                if (prev != EOF && prev != 'E') {
+                if (prev != stream.EOF && prev != 'E') {
                     undoChar();
                     return O2Token.NUMBER;
                 }
@@ -291,15 +257,15 @@ class O2Lexer implements Lexer<O2TokenId> {
 
     private O2Token identifier() {
         char ch = getChar();
-        StringBuilder testWord = new StringBuilder();
-        while (ch != EOF && Character.isJavaIdentifierPart(ch)) {
-            testWord.append(ch);
+        StringBuilder sb = new StringBuilder();
+        while (ch != stream.EOF && Character.isJavaIdentifierPart(ch)) {
+            sb.append(ch);
             ch = getChar();
         }
         undoChar();
-        String test = testWord.toString();
+        strVal = sb.toString();
         for (O2Token token : O2Token.values()) {
-            if (test.equals(token.getName())) {
+            if (strVal.equals(token.getName())) {
                 return token;
             }
         }
@@ -309,12 +275,12 @@ class O2Lexer implements Lexer<O2TokenId> {
     private O2Token string(char end) {
         char ch = getChar();
         StringBuilder str = new StringBuilder();
-        while (ch != EOF && ch != end) {
+        while (ch != stream.EOF && ch != end) {
             str.append(ch);
             ch = getChar();
         }
         strVal = str.toString();
-        if (ch == EOF) {
+        if (ch == stream.EOF) {
             undoChar();
             return O2Token.ERROR;
         }
@@ -325,7 +291,7 @@ class O2Lexer implements Lexer<O2TokenId> {
         int level = 1;
         CommentState state = CommentState.STAR;
         char ch = getChar();
-        while (ch != EOF && level > 0) {
+        while (ch != stream.EOF && level > 0) {
             if (ch == '(') {
                 state = CommentState.LPAREN;
             } else if (ch == '*') {
@@ -343,7 +309,7 @@ class O2Lexer implements Lexer<O2TokenId> {
             }
             ch = getChar();
         }
-        if (ch == EOF) {
+        if (ch == stream.EOF) {
             undoChar();
             return O2Token.ERROR;
         }
