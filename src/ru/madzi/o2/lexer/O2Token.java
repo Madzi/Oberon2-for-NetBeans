@@ -24,7 +24,7 @@ public enum O2Token {
     GTR(">", O2Category.OPERATOR, 13),
     GEQ(">=", O2Category.OPERATOR, 14),
     IN("IN", O2Category.OPERATOR, 15),
-    IS("IS", O2Category.OPERATOR, 16),
+    IS("IS", O2Category.KEYWORD, 16),
     ARROW("^", O2Category.OPERATOR, 17),
     PERIOD(".", O2Category.SEPARATOR, 18),
     COMMA(",", O2Category.SEPARATOR, 19),

@@ -14,6 +14,10 @@ class O2Lexer implements Lexer<O2TokenId> {
 
     private LexerRestartInfo<O2TokenId> info;
 
+    private long intVal;
+
+    private double realVal;
+
     private String strVal;
 
     public O2Lexer(LexerRestartInfo<O2TokenId> info) {
@@ -162,14 +166,123 @@ class O2Lexer implements Lexer<O2TokenId> {
         }
     }
 
+    private static double ten(int e) {
+        double x = 1;
+        double p = 10;
+        while (e > 0) {
+            if (e % 2 == 1) { // ODD(e)
+                x *= p;
+            }
+            e = e / 2;
+            if (e > 0) {
+                p *= p;
+            }
+        }
+        return x;
+    }
+
+    /**
+     * Convert char into number.
+     * 
+     * @param ch the char
+     * @param hex flag, if <b>true</b>that used hex digits
+     * @return the number
+     */
+    private int ord(char ch, boolean hex) {
+        switch (ch) {
+            case '0':
+                return 0;
+
+            case '1':
+                return 1;
+
+            case '2':
+                return 2;
+
+            case '3':
+                return 3;
+
+            case '4':
+                return 4;
+
+            case '5':
+                return 5;
+
+            case '6':
+                return 6;
+
+            case '7':
+                return 7;
+
+            case '8':
+                return 8;
+
+            case '9':
+                return 9;
+
+            case 'A':
+                return hex ? 10 : -1;
+
+            case 'B':
+                return hex ? 11 : -1;
+
+            case 'C':
+                return hex ? 12 : -1;
+
+            case 'D':
+                return hex ? 13 : -1;
+
+            case 'E':
+                return hex ? 14 : -1;
+
+            case 'F':
+                return hex ? 15 : -1;
+        }
+        return -1;
+    }
+
+    private int parseInt(String str, char end) {
+        return 0;
+        //TODO: Write parse int;
+    }
+
     private O2Token number() {
+        boolean wasdot = false;
+        boolean real = false;
+        char prev = EOF;
         char ch = getChar();
+        StringBuilder sb = new StringBuilder();
         while (ch != EOF && isNumberChar(ch)) {
             if (ch == 'H') {
-                return O2Token.NUMBER;
+                intVal = parseInt(sb.toString(), ch);
+                return real ? O2Token.ERROR : O2Token.NUMBER;
             } else if (ch == 'X') {
-                return O2Token.NUMBER;
+                intVal = parseInt(sb.toString(), ch);
+                return real ? O2Token.ERROR : O2Token.NUMBER;
+            } else if (ch == '.') {
+                if (ch == prev) { // 123..321
+                    undoChar();
+                    undoChar();
+                    intVal = parseInt(sb.toString(), 'D');
+                    return real ? O2Token.ERROR : O2Token.NUMBER;
+                } else if (wasdot) {
+                    return O2Token.ERROR;
+                } else {
+                    wasdot = true;
+                }
+            } else if (ch == '-') {
+                if (prev != EOF && prev != 'E') {
+                    undoChar();
+                    return O2Token.NUMBER;
+                }
+            } else if (ch == '+') {
+                if (prev != EOF && prev != 'E') {
+                    undoChar();
+                    return O2Token.NUMBER;
+                }
             }
+            prev = ch;
+            sb.append(ch);
             ch = getChar();
         }
         undoChar();
@@ -257,6 +370,9 @@ class O2Lexer implements Lexer<O2TokenId> {
             case 'F':
             case 'H':
             case 'X':
+            case '.':
+            case '-':
+            case '+':
                 return true;
         }
         return false;
