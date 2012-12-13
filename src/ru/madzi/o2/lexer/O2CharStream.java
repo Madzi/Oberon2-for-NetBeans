@@ -54,6 +54,7 @@ public class O2CharStream {
         if (result == '\n') {
             line++;
             charPositionInLine = 0;
+            newLines.add(Integer.valueOf(index));
         }
         return (result != LexerInput.EOF) ? (char) result : EOF;
     }

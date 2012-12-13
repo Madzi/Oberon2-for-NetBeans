@@ -1,7 +1,7 @@
 package ru.madzi.o2.lexer;
 
 /**
- * @author deliseev
+ * @author Dmitry Eliseev
  */
 public class O2Lexer {
 
