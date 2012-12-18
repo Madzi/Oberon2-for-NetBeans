@@ -1,89 +1,31 @@
 package ru.madzi.o2.parser;
 
-import javax.swing.event.ChangeListener;
-import org.netbeans.modules.parsing.api.Snapshot;
-import org.netbeans.modules.parsing.api.Task;
-import org.netbeans.modules.parsing.spi.ParseException;
-import org.netbeans.modules.parsing.spi.Parser;
-import org.netbeans.modules.parsing.spi.SourceModificationEvent;
-import org.netbeans.spi.lexer.LexerRestartInfo;
-import ru.madzi.o2.lexer.O2Lexer;
 import ru.madzi.o2.ast.ASTNode;
-import ru.madzi.o2.lexer.O2LanguageHierarchy;
-import ru.madzi.o2.lexer.O2TokenId;
+import ru.madzi.o2.chars.O2SnapshotCharStream;
+import ru.madzi.o2.lexer.O2Lexer;
+import ru.madzi.o2.lexer.O2Token;
 
 /**
  * @author Dmitry Eliseev
  */
-public class O2Parser extends Parser {
+public class O2Parser {
 
-    private boolean cancelled = false;
+    private O2Lexer lexer;
     private ASTNode ast;
-    private Snapshot snapshot;
 
-    @Override
-    public void parse(Snapshot snapshot, Task task, SourceModificationEvent event) throws ParseException {
-        cancelled = false;
-        this.snapshot = snapshot;
-        // for {
-        // parsong snapshot.getText()
-        // if (cancelled) return;
-        // }
-        // ast = ...;
+    public O2Parser(CharSequence sequence) {
+        lexer = new O2Lexer(new O2SnapshotCharStream(sequence));
     }
 
-    @Override
-    public Result getResult(Task task) throws ParseException {
-        return new O2ParserResult(snapshot, this);
+    public void parse() {
+        O2Token token = lexer.getToken();
+        while (token != O2Token.EOF) {
+            token = lexer.getToken();
+        }
     }
 
     public ASTNode getAST() {
         return ast;
-    }
-
-    public void cancel()  {
-        cancelled = true;
-    }
-
-    @Override
-    public void addChangeListener(ChangeListener changeListener) {
-    }
-
-    @Override
-    public void removeChangeListener(ChangeListener changeListener) {
-    }
-
-    public static class O2ParserResult extends Result {
-
-        private O2Parser parser;
-        private boolean valid = true;
-        private ASTNode ast;
-
-        public O2ParserResult(Snapshot snapshot, O2Parser parser) {
-            super(snapshot);
-            this.parser = parser;
-            this.ast = parser.getAST();
-        }
-
-        public O2Parser getO2Parser() throws ParseException {
-            if (!valid) {
-                throw new ParseException();
-            }
-            return parser;
-        }
-
-        public ASTNode getAST() throws ParseException {
-            if (!valid) {
-                throw new ParseException();
-            }
-            return ast;
-        }
-
-        @Override
-        protected void invalidate() {
-            valid = false;
-            ast = null;
-        }
     }
 
 }

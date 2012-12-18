@@ -1,11 +1,13 @@
 package ru.madzi.o2.lexer;
 
+import ru.madzi.o2.chars.O2AbstractCharStream;
+
 /**
  * @author Dmitry Eliseev
  */
 public class O2Lexer {
 
-    private O2CharStream stream;
+    private O2AbstractCharStream stream;
 
     private long intVal;
 
@@ -13,12 +15,12 @@ public class O2Lexer {
 
     private String strVal;
 
-    public O2Lexer(O2CharStream stream) {
+    public O2Lexer(O2AbstractCharStream stream) {
         this.stream = stream;
     }
 
     private char getChar() {
-        return stream.read();
+        return stream.readChar();
     }
 
     private void undoChar() {

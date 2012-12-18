@@ -1,12 +1,11 @@
-package ru.madzi.o2.lexer;
+package ru.madzi.o2.chars;
 
 import java.util.TreeSet;
-import org.netbeans.spi.lexer.LexerInput;
 
 /**
  * @author Dmitry Eliseev
  */
-public class O2CharStream {
+public abstract class O2AbstractCharStream {
 
     public static final char EOF = (char) -1;
 
@@ -18,10 +17,7 @@ public class O2CharStream {
 
     private int charPositionInLine = 0;
 
-    private LexerInput input;
-
-    public O2CharStream(LexerInput input) {
-        this.input = input;
+    public O2AbstractCharStream() {
         newLines.add(Integer.valueOf(0));
     }
 
@@ -29,7 +25,7 @@ public class O2CharStream {
         return line;
     }
 
-    public O2CharStream setLine(int line) {
+    public O2AbstractCharStream setLine(int line) {
         this.line = line;
         return this;
     }
@@ -38,7 +34,7 @@ public class O2CharStream {
         return charPositionInLine;
     }
 
-    public O2CharStream setCharPositionInLine(int charPositionInLine) {
+    public O2AbstractCharStream setCharPositionInLine(int charPositionInLine) {
         this.charPositionInLine = charPositionInLine;
         return this;
     }
@@ -47,27 +43,32 @@ public class O2CharStream {
         return index;
     }
 
-    public char read() {
-        int result = input.read();
+    public char readChar() {
+        char ch = read();
         index++;
         charPositionInLine++;
-        if (result == '\n') {
+        if (ch == '\n') {
             line++;
             charPositionInLine = 0;
             newLines.add(Integer.valueOf(index));
         }
-        return (result != LexerInput.EOF) ? (char) result : EOF;
+        return ch;
     }
 
     public void undoChar(int count) {
         int newIdx = index - count;
+        assert newIdx > 0;
         while (newLines.last() > newIdx) {
             newLines.remove(newLines.last());
         }
         index = newIdx;
         line = newLines.size();
         charPositionInLine = index - newLines.last();
-        input.backup(count);
+        backup(count);
     }
+
+    protected abstract char read();
+
+    protected abstract void backup(int count);
 
 }

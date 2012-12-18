@@ -12,7 +12,7 @@ public class O2ParserFactory extends ParserFactory {
 
     @Override
     public Parser createParser(Collection<Snapshot> snapshots) {
-        return new O2Parser();
+        return new O2WarpParser();
     }
     
 }
